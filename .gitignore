@@ -155,3 +155,5 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+Dune/Assembly-CSharp.dll
+Dune/UnityEngine.dll
