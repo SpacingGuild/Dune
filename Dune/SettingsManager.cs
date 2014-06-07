@@ -1,0 +1,56 @@
+﻿using UnityEngine;
+
+namespace Dune
+{
+    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    internal class SettingsManager : MonoBehaviour
+    {
+        private static ConfigNode node;
+
+        public static string GetValue(string key)
+        {
+            load();
+            return node.GetValue(key);
+        }
+
+        public static void SetValue(string key, object value)
+        {
+            load();
+            if (node.HasValue(key))
+            {
+                node.RemoveValue(key);
+                node.AddValue(key, value);
+            }
+        }
+
+        public static void Save()
+        {
+            load();
+            Debug.LogWarning("[Dune] Saving Settings");
+            node.Save(settingsFile);
+        }
+
+        private static void load()
+        {
+            if (node != null) { return; }
+            Debug.LogWarning("[Dune] Loading Settings");
+            node = ConfigNode.Load(settingsFile) ?? new ConfigNode();
+        }
+
+        private static string settingsFile
+        {
+            get { return KSPUtil.ApplicationRootPath + "GameData/SpacingGuild/Dune/settings.cfg"; }
+        }
+
+        public void Awake()
+        {
+            MonoBehaviour.DontDestroyOnLoad(this);
+        }
+
+        public void Destroy()
+        {
+            Debug.LogError("[Dune] SettingsManager OnDestroy saveSettings");
+            Save();
+        }
+    }
+}
