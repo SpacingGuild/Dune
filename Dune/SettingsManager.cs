@@ -2,7 +2,8 @@
 
 namespace Dune
 {
-    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    //Disabled while testing new config manager
+    //[KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class SettingsManager : MonoBehaviour
     {
         private static ConfigNode node;
@@ -26,14 +27,14 @@ namespace Dune
         public static void Save()
         {
             load();
-            Debug.LogWarning("[Dune] Saving Settings");
+            Debug.LogWarning("[Dune] Saving Settings " + HighLogic.LoadedScene);
             node.Save(settingsFile);
         }
 
         private static void load()
         {
             if (node != null) { return; }
-            Debug.LogWarning("[Dune] Loading Settings");
+            Debug.LogWarning("[Dune] Loading Settings " + HighLogic.LoadedScene);
             node = ConfigNode.Load(settingsFile) ?? new ConfigNode();
         }
 
@@ -47,9 +48,9 @@ namespace Dune
             MonoBehaviour.DontDestroyOnLoad(this);
         }
 
-        public void Destroy()
+        public void OnDestroy()
         {
-            Debug.LogError("[Dune] SettingsManager OnDestroy saveSettings");
+            Debug.LogWarning("[Dune] SettingsManager OnDestroy saveSettings");
             Save();
         }
     }

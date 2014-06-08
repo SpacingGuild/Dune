@@ -49,13 +49,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DuneDataController.cs" />
-    <Compile Include="DuneDekesslerController.cs" />
-    <Compile Include="DuneFlightController.cs" />
-    <Compile Include="KSPAddonFixed.cs" />
+    <Compile Include="ControlModule.cs" />
+    <Compile Include="DisplayModule.cs" />
+    <Compile Include="DuneCore.cs" />
+    <Compile Include="DuneDataControl.cs" />
+    <Compile Include="DuneTrackingControl.cs" />
+    <Compile Include="DuneFlightControl.cs" />
+    <Compile Include="DuneFPSControl.cs" />
+    <Compile Include="DuneMenuControl.cs" />
+    <Compile Include="DuneTrackingWindow.cs" />
     <Compile Include="PartExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DuneThrottleController.cs" />
+    <Compile Include="DuneThrottleControl.cs" />
     <Compile Include="SettingsManager.cs" />
     <Compile Include="ToolbarWrapper.cs" />
     <Compile Include="Utilities.cs" />

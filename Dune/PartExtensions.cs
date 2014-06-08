@@ -1,24 +1,29 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Dune
 {
     public static class PartExtensions
     {
-        public static bool IsPrimary(this Part thisPart, List<Part> partsList, int modeuleClassId)
+        public static bool HasModule<T>(this Part thisPart) where T : PartModule
         {
-            foreach (Part part in partsList)
-            {
-                if (part.Modules.Contains(modeuleClassId))
-                {
-                    if (part == thisPart)
-                        return true;
-                    else
-                        break;
-                }
-            }
+            return thisPart.Modules.OfType<T>().Count() > 0;
+        }
 
-            return false;
+        public static float TotalMass(this Part thisPart)
+        {
+            return thisPart.mass + thisPart.GetResourceMass();
+        }
+
+        public static bool IsEngine(this Part thisPart)
+        {
+            return (thisPart is SolidRocket ||
+                thisPart is LiquidEngine ||
+                thisPart is LiquidFuelEngine ||
+                thisPart is AtmosphericEngine ||
+                thisPart.HasModule<ModuleEngines>() ||
+                thisPart.HasModule<ModuleEnginesFX>());
         }
     }
 }

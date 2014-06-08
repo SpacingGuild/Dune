@@ -157,3 +157,5 @@ $RECYCLE.BIN/
 .DS_Store
 Dune/Assembly-CSharp.dll
 Dune/UnityEngine.dll
+/Dune/Snippets
+/toolbar.tga
