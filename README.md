@@ -3,4 +3,5 @@ Spacing Guild: Dune
 
 Maintainer: [Yilmas](http://forum.kerbalspaceprogram.com/members/85539-Yilmas)
 
-All Rights Reserved
+All Rights Reserved - See license in the wiki for further details.
+Dune is the registered Trademark and intellectual property of Frank Herberts
