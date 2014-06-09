@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using KSP.IO;
+﻿using System.Collections.Generic;
 
 namespace Dune
 {
@@ -11,8 +8,7 @@ namespace Dune
 
         public override void OnAwake()
         {
-            //COMMENT: Monitor DuneDataControl OnAwake()
-            Debug.Log("[Dune] DuneDataControl OnAwake()");
+
         }
 
         private double techTier()

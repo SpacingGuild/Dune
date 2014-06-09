@@ -1,18 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Dune
 {
     public class DuneThrottleControl : ControlModule
     {
         public DuneThrottleControl(DuneCore core) : base(core) { }
-
-        public override void OnStart()
-        {
-            //COMMENT: Monitor DuneThrottleControl OnStart()
-            Debug.Log("[Dune] DuneThrottleControl OnStart()");
-        }
 
         public override void OnUpdate()
         {

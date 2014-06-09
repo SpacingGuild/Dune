@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace Dune
@@ -10,13 +7,16 @@ namespace Dune
     {
         public bool windowIsHidden = false;
 
+        public bool showInCurrentScene {
+            get 
+            {
+                return (HighLogic.LoadedScene == showInScene) ? true : false;
+            }
+        }
+        
         [Persistent(pass = (int)Pass.configGlobal)]
-        public bool showInFlight = true;
-
-        [Persistent(pass = (int)Pass.configGlobal)]
-        public bool showInTrack = false;
-        public bool showInCurrentScene {get {return (HighLogic.LoadedSceneIsFlight ? showInFlight : showInTrack);}}
-
+        public GameScenes showInScene = GameScenes.FLIGHT;
+        
         [Persistent(pass = (int)Pass.configGlobal)]
         public Vector4 windowVector = new Vector4(10, 40, 0, 0);
 
@@ -39,11 +39,23 @@ namespace Dune
             {
                 if(HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 {
+                    windowVectorTrack = new Vector4
+                    (
+                        Math.Min(Math.Max(value.x, 0),Screen.width - value.width),
+                        Math.Min(Math.Max(value.y, 0), Screen.height - value.height),
+                        value.width, value.height
+                    );
                     windowVectorTrack.x = Mathf.Clamp(windowVectorTrack.x, 10 - value.width, Screen.width - 10);
                     windowVectorTrack.y = Mathf.Clamp(windowVectorTrack.y, 10 - value.height, Screen.height - 10);
                 }
                 else
                 {
+                    windowVector = new Vector4
+                    (
+                        Math.Min(Math.Max(value.x, 0), Screen.width - value.width),
+                        Math.Min(Math.Max(value.y, 0), Screen.height - value.height),
+                        value.width, value.height
+                    );
                     windowVector.x = Mathf.Clamp(windowVector.x, 10 - value.width, Screen.width - 10);
                     windowVector.y = Mathf.Clamp(windowVector.y, 10 - value.height, Screen.height - 10);
                 }
@@ -71,7 +83,7 @@ namespace Dune
             GUI.DragWindow();
         }
 
-        public virtual void DrawGUI(bool inTrack)
+        public virtual void DrawGUI()
         {
             if(showInCurrentScene)
             {

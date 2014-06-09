@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Dune
@@ -24,8 +23,14 @@ namespace Dune
             get { return _enabled; }
             set
             {
-                if (value != _enabled) OnControllerEnabled();
-                else OnControllerDisabled();
+                if (value != _enabled)
+                {
+                    _enabled = value;
+                    if (_enabled)
+                        OnControllerEnabled();
+                    else
+                        OnControllerDisabled();
+                }
             }
         }
 

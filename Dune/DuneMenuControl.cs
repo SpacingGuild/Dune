@@ -23,18 +23,19 @@ namespace Dune
 
         public override void OnStart()
         {
-            //COMMENT: Monitor MenuControl OnStart()
-            Debug.Log("[Dune] MenuControl OnStart()");
             SetupToolBarButtons();
         }
 
         public override void OnUpdate()
         {
-            foreach(DisplayModule module in core.GetControlModules<DisplayModule>())
+            if(!ToolbarManager.ToolbarAvailable)
             {
-                if(!module.windowIsHidden && module.showInCurrentScene)
+                foreach (DisplayModule module in core.GetControlModules<DisplayModule>())
                 {
-                    module.enabled = true;
+                    if (!module.windowIsHidden && module.showInCurrentScene)
+                    {
+                        module.enabled = true;
+                    }
                 }
             }
         }
@@ -43,7 +44,7 @@ namespace Dune
         {
             foreach(DisplayModule module in core.GetControlModules<DisplayModule>())
             {
-                if(!module.windowIsHidden && module.showInCurrentScene)
+                if(!module.windowIsHidden)
                 {
                     SetupToolbarButton(module);
                 }
@@ -79,7 +80,7 @@ namespace Dune
                     btn = toolbarButtons[name];
                 }
 
-                btn.Visible = module.showInCurrentScene;
+                btn.Visibility = new GameScenesVisibility(module.showInScene);
                 string TexturePath = "SpacingGuild/Dune/Icons/" + name;
                 if(GameDatabase.Instance.GetTexture(TexturePath, false) == null)
                 {
@@ -103,13 +104,10 @@ namespace Dune
             {
                 foreach(Button btn in toolbarButtons.Values)
                 {
-                    Debug.Log("[Dune] MenuControl OnDestroy() btn");
                     btn.Destroy();
                 }
-                Debug.Log("[Dune] MenuControl OnDestroy() toolbarButtons");
                 toolbarButtons.Clear();
             }
-            Debug.Log("[Dune] MenuControl OnDestroy() base");
             base.OnDestroy();
         }
 

@@ -53,7 +53,7 @@
     <Compile Include="DisplayModule.cs" />
     <Compile Include="DuneCore.cs" />
     <Compile Include="DuneDataControl.cs" />
-    <Compile Include="DuneTrackingControl.cs" />
+    <Compile Include="DuneDebrisControl.cs" />
     <Compile Include="DuneFlightControl.cs" />
     <Compile Include="DuneFPSControl.cs" />
     <Compile Include="DuneMenuControl.cs" />

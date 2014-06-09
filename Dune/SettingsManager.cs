@@ -2,7 +2,7 @@
 
 namespace Dune
 {
-    //Disabled while testing new config manager
+    //Disabled: Might be used again at some point.
     //[KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class SettingsManager : MonoBehaviour
     {

@@ -25,6 +25,13 @@ namespace Dune
 
             return value;
         }
+
+        public static bool IsNull<T>(this T @object)
+        {
+            return Equals(@object, null);
+        }
+
+
     }
 
     //public static DuneThrottleController Current

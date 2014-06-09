@@ -1,10 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using KSP.IO;
 
 namespace Dune
 {
-    public class DuneFlightControl : PartModule, IComparable<DuneFlightControl>
+    public class DuneFlightControl : PartModule
     {
         private static Rect _windowPosition = new Rect();
         private GUIStyle _windowStyle, _labelStyle;

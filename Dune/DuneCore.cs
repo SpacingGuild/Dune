@@ -1,9 +1,8 @@
-﻿using System;
+﻿using KSP.IO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using KSP.IO;
-using System.Reflection;
 
 namespace Dune
 {
@@ -12,7 +11,7 @@ namespace Dune
     {
         //Dune Controllers
         public DuneMenuControl _duneMenuControl;
-        public DuneTrackingControl _duneTrackingControl;
+        public DuneDebrisControl _duneDebrisControl;
         public DuneThrottleControl _duneThrottleControl;
 
         private List<ControlModule> controlModules = new List<ControlModule>();
@@ -26,7 +25,6 @@ namespace Dune
         public static bool IsCareer;
 
         public RenderingManager renderingManager = null;
-        public GUIStyle _windowStyle, _labelStyle;
         public bool showGui = true;
 
 
@@ -90,9 +88,6 @@ namespace Dune
         public override void OnAwake()
         {
             MonoBehaviour.DontDestroyOnLoad(this);
-
-            //COMMENT: Monitor Core OnAwake()
-            Debug.Log("[Dune] Core OnAwake()");
 
             if (HighLogic.LoadedScene == GameScenes.LOADING || HighLogic.LoadedScene == GameScenes.MAINMENU) return;
 
@@ -166,6 +161,8 @@ namespace Dune
                     Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnUpdate:" + e);
                 }
             }
+
+            if (HighLogic.LoadedScene == GameScenes.MAINMENU) OnDestroy();
         }
 
         void LoadControlModules()
@@ -177,10 +174,10 @@ namespace Dune
                 {
                     try
                     {
-                        foreach (var module in ass.GetTypes().Where(p => p.IsSubclassOf(typeof(ControlModule))).ToList()) //(from t in ass.GetTypes() where t.IsSubclassOf(typeof(ControlModule)) select t).ToList())
+                        foreach (var module in ass.GetTypes().Where(p => p.IsSubclassOf(typeof(ControlModule))).ToList())
                         {
-                            //COMMENT: Monitor in log which Assemblies gets loaded.
-                            Debug.LogWarning("[Dune] Core Module loaded: " + module.FullName);
+                            //COMMENT: Monitor Core Assemblies load.
+                            Debug.LogWarning("[Dune] Core assembly loaded: " + module.FullName);
                             moduleRegistry.Add(module);
                         }
                     }
@@ -206,7 +203,7 @@ namespace Dune
 
             //TODO: Add new controlModules here.
             _duneMenuControl = GetControlModule<DuneMenuControl>();
-            _duneTrackingControl = GetControlModule<DuneTrackingControl>();
+            _duneDebrisControl = GetControlModule<DuneDebrisControl>();
             _duneThrottleControl = GetControlModule<DuneThrottleControl>();
         }
 
@@ -364,7 +361,6 @@ namespace Dune
                     }
                 }
 
-                //COMMENT: Monitor Core OnSave() configNode values
                 /*
                 Debug.Log("[Dune] Core OnSave() configNode values:");
                 Debug.Log("configGlobal:");
@@ -389,7 +385,7 @@ namespace Dune
                 catch (Exception e)
                 {
                     Debug.LogError("[Dune] Core OnSave() sfsnode/configLocal: " + e);
-                }*/
+                }//*/
 
                 if (HighLogic.LoadedSceneIsFlight)
                 {
@@ -413,12 +409,9 @@ namespace Dune
 
         public void OnDestroy()
         {
-            //COMMENT: Monitor Core OnDestroy()
-            Debug.LogWarning("[Dune] Core OnDestroy()");
-            if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || FlightGlobals.ActiveVessel.isActiveVessel)
-            {
-                OnSave(null);
-            }
+            Debug.Log("[Dune] Core Destroy()");
+
+            OnSave(null);
 
             foreach (ControlModule module in controlModules)
             {
@@ -436,8 +429,7 @@ namespace Dune
         private void OnGUI()
         {
             if (!showGui) return;
-
-            //Check GUI init
+            //COMMENT: Custom GUI init
 
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION)
             {
@@ -445,11 +437,11 @@ namespace Dune
                 {
                     try
                     {
-                        if (module.enabled) module.DrawGUI(HighLogic.LoadedScene == GameScenes.TRACKSTATION);
+                        if (module.enabled) module.DrawGUI();
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("[Dune] Core OnGUI: module " + module.GetType().Name + " threw an exception in DrawGUI: " + e);
+                        Debug.LogError("[Dune] Core OnGUI: module " + module.GetName() + " threw an exception in DrawGUI: " + e);
                     }
                 }
             }
