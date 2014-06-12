@@ -57,6 +57,7 @@
     <Compile Include="DuneFlightControl.cs" />
     <Compile Include="DuneFPSControl.cs" />
     <Compile Include="DuneMenuControl.cs" />
+    <Compile Include="DuneResourceControl.cs" />
     <Compile Include="DuneTrackingWindow.cs" />
     <Compile Include="PartExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

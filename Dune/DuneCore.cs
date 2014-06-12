@@ -13,6 +13,8 @@ namespace Dune
         public DuneMenuControl _duneMenuControl;
         public DuneDebrisControl _duneDebrisControl;
         public DuneThrottleControl _duneThrottleControl;
+        public DuneDataControl _duneDataControl;
+        public DuneResourceControl _duneResourceControl;
 
         private List<ControlModule> controlModules = new List<ControlModule>();
         private List<ControlModule> controlModulesToLoad = new List<ControlModule>();
@@ -26,6 +28,8 @@ namespace Dune
 
         public RenderingManager renderingManager = null;
         public bool showGui = true;
+
+        private bool run = true;
 
 
 
@@ -50,37 +54,7 @@ namespace Dune
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("[Dune] module" + module.GetType().Name + " threw an exception in OnStart:" + e);
-                }
-            }
-        }
-
-        public void OnActive()
-        {
-            foreach (ControlModule module in controlModules)
-            {
-                try
-                {
-                    module.OnActive();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnActive:" + e);
-                }
-            }
-        }
-
-        public void OnInactive()
-        {
-            foreach (ControlModule module in controlModules)
-            {
-                try
-                {
-                    module.OnInactive();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnInactive:" + e);
+                    Debug.LogError("[Dune] Core Start() Module: " + module.GetType().Name + " Exception: " + e);
                 }
             }
         }
@@ -88,8 +62,6 @@ namespace Dune
         public override void OnAwake()
         {
             MonoBehaviour.DontDestroyOnLoad(this);
-
-            if (HighLogic.LoadedScene == GameScenes.LOADING || HighLogic.LoadedScene == GameScenes.MAINMENU) return;
 
             foreach (ControlModule module in controlModules)
             {
@@ -99,7 +71,7 @@ namespace Dune
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnAwake:" + e);
+                    Debug.LogError("[Dune] Core OnAwake() Module: " + module.GetType().Name + " Exception: " + e);
                 }
             }
         }
@@ -116,15 +88,13 @@ namespace Dune
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in FixedUpdate:" + e);
+                    Debug.LogError("[Dune] Core FixedUpdate() Module: " + module.GetType().Name + " Exception: " + e);
                 }
             }
         }
 
         public void Update()
         {
-            if (HighLogic.LoadedScene != GameScenes.TRACKSTATION || HighLogic.LoadedSceneIsFlight) return;
-
             if (renderingManager == null)
             {
                 renderingManager = (RenderingManager)GameObject.FindObjectOfType(typeof(RenderingManager));
@@ -154,15 +124,25 @@ namespace Dune
             {
                 try
                 {
+                    if (!(module is DisplayModule))
+                    {
+                        if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
+                        {
+                            module.enabled = true;
+                        }
+                        else
+                        {
+                            module.enabled = false;
+                        }
+                    }
+
                     if (module.enabled) module.OnUpdate();
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnUpdate:" + e);
+                    Debug.LogError("[Dune] Core OnUpdate() Module: " + module.GetType().Name + " Exception: " + e);
                 }
             }
-
-            if (HighLogic.LoadedScene == GameScenes.MAINMENU) OnDestroy();
         }
 
         void LoadControlModules()
@@ -183,7 +163,7 @@ namespace Dune
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("[Dune] moduleRegistry creation threw an exception in LoadControlModules loading " + ass.FullName + ": " + e);
+                        Debug.LogError("[Dune] Core LoadControlModules() moduleRegistry loading: " + ass.FullName + " Exception: " + e);
                     }
                 }
             }
@@ -198,13 +178,15 @@ namespace Dune
             }
             catch (Exception e)
             {
-                Debug.LogError("[Dune] moduleRegistry loading threw an exception in LoadControlModules: " + e);
+                Debug.LogError("[Dune] Core LoadControlModules() moduleRegistry: " + e);
             }
 
-            //TODO: Add new controlModules here.
+            //COMMENT: Add new controlModules here.
             _duneMenuControl = GetControlModule<DuneMenuControl>();
             _duneDebrisControl = GetControlModule<DuneDebrisControl>();
             _duneThrottleControl = GetControlModule<DuneThrottleControl>();
+            _duneDataControl = GetControlModule<DuneDataControl>();
+            _duneResourceControl = GetControlModule<DuneResourceControl>();
         }
 
         void LoadDelayedModules()
@@ -237,28 +219,15 @@ namespace Dune
                 LoadControlModules();
 
                 ConfigNode configGlobal = new ConfigNode("DuneGlobalSettings");
-                if (File.Exists<DuneCore>("dune_global_settings.cfg"))
+                if (File.Exists<DuneCore>("dune_settings_global.cfg"))
                 {
                     try
                     {
-                        configGlobal = ConfigNode.Load(IOUtils.GetFilePathFor(this.GetType(), "dune_global_settings.cfg"));
+                        configGlobal = ConfigNode.Load(IOUtils.GetFilePathFor(this.GetType(), "dune_settings_global.cfg"));
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("[Dune] global exception when trying to load dune_global_settings.cfg: " + e);
-                    }
-                }
-
-                ConfigNode configTechTier = new ConfigNode("DuneTechTierSettings");
-                if (File.Exists<DuneCore>("dune_techtier_settings.cfg"))
-                {
-                    try
-                    {
-                        configTechTier = ConfigNode.Load(IOUtils.GetFilePathFor(this.GetType(), "dune_techtier_settings.cfg"));
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("[Dune] techTier exception when trying to load dune_techtier_settings.cfg: " + e);
+                        Debug.LogError("[Dune] Core OnLoad() dune_settings_global.cfg: " + e);
                     }
                 }
 
@@ -272,7 +241,7 @@ namespace Dune
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("[Dune.Onload] caught an exception trying to load dune_settings_type_" + vesselName + ".cfg: " + e);
+                        Debug.LogError("[Dune] Core OnLoad() dune_settings_type_" + vesselName + ".cfg: " + e);
                     }
                 }
 
@@ -291,11 +260,11 @@ namespace Dune
                     {
                         try
                         {
-                            module.OnSave(null, null, null, configLocal.AddNode(module.GetType().Name));
+                            module.OnSave(configGlobal.AddNode(module.GetType().Name), configVessel.AddNode(module.GetType().Name), configLocal.AddNode(module.GetType().Name));
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnLoad: " + e);
+                            Debug.LogError("[Dune] Core OnLoad() configLocal Module: " + module.GetType().Name + " Exception: " + e);
                         }
                     }
                 }
@@ -307,10 +276,9 @@ namespace Dune
                     {
                         string name = module.GetType().Name;
                         ConfigNode moduleGlobal = configGlobal.HasNode(name) ? configGlobal.GetNode(name) : null;
-                        ConfigNode moduleTechTier = configTechTier.HasNode(name) ? configTechTier.GetNode(name) : null;
                         ConfigNode moduleVessel = configVessel.HasNode(name) ? configVessel.GetNode(name) : null;
                         ConfigNode moduleLocal = configLocal.HasNode(name) ? configLocal.GetNode(name) : null;
-                        module.OnLoad(moduleGlobal, moduleTechTier, moduleVessel, moduleLocal);
+                        module.OnLoad(moduleGlobal, moduleVessel, moduleLocal);
                     }
                     catch (Exception e)
                     {
@@ -322,7 +290,7 @@ namespace Dune
             }
             catch (Exception e)
             {
-                Debug.LogError("[Dune] caught exception in core OnLoad: " + e);
+                Debug.LogError("[Dune] Core OnLoad(): " + e);
             }
         }
 
@@ -344,7 +312,6 @@ namespace Dune
                 LoadDelayedModules();
 
                 ConfigNode configGlobal = new ConfigNode("DuneGlobalSettings");
-                ConfigNode configTechTier = new ConfigNode("DuneTechTierSettings");
                 ConfigNode configVessel = new ConfigNode("DuneVesselSettings");
                 ConfigNode configLocal = new ConfigNode("DuneLocalSettings");
 
@@ -353,11 +320,11 @@ namespace Dune
                     try
                     {
                         string name = module.GetType().Name;
-                        module.OnSave(configGlobal.AddNode(name), configTechTier.AddNode(name), configVessel.AddNode(name), configLocal.AddNode(name));
+                        module.OnSave(configGlobal.AddNode(name), configVessel.AddNode(name), configLocal.AddNode(name));
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnSave: " + e);
+                        Debug.LogError("[Dune] Core OnSave() module " + module.GetType().Name + " Exception: " + e);
                     }
                 }
 
@@ -397,12 +364,11 @@ namespace Dune
                 if (true)
                 {
                     configGlobal.Save(IOUtils.GetFilePathFor(this.GetType(), "dune_settings_global.cfg"));
-                    configTechTier.Save(IOUtils.GetFilePathFor(this.GetType(), "dune_settings_techtier.cfg"));
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError("[Dune] caught an exception in core OnSave: " + e);
+                Debug.LogError("[Dune] Core OnSave() Exception: " + e);
             }
 
         }
@@ -421,7 +387,7 @@ namespace Dune
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("[Dune] module " + module.GetType().Name + " threw an exception in OnDestroy " + e);
+                    Debug.LogError("[Dune] Core OnDestroy() module " + module.GetType().Name + " Exception: " + e);
                 }
             }
         }
@@ -441,7 +407,7 @@ namespace Dune
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("[Dune] Core OnGUI: module " + module.GetName() + " threw an exception in DrawGUI: " + e);
+                        Debug.LogError("[Dune] Core OnGUI() module " + module.GetName() + " Exception: " + e);
                     }
                 }
             }

@@ -9,7 +9,7 @@ namespace Dune
         public DuneCore core = null;
         public int priority = 0;
 
-        public static List<GameScenes> runModuleInScenes = new List<GameScenes>();
+        public List<GameScenes> runModuleInScenes = new List<GameScenes>();
 
         public int CompareTo(ControlModule other)
         {
@@ -41,10 +41,12 @@ namespace Dune
 
         public virtual void OnControllerEnabled()
         {
+            Debug.Log("[Dune] " + this.GetType().Name + " Enabled: " + enabled);
         }
 
         public virtual void OnControllerDisabled()
         {
+            Debug.Log("[Dune] " + this.GetType().Name + " Enabled: " + enabled);
         }
 
         public virtual void OnStart()
@@ -71,12 +73,11 @@ namespace Dune
         {
         }
 
-        public virtual void OnLoad(ConfigNode configGlobal, ConfigNode configTechTier, ConfigNode configVessel, ConfigNode configLocal)
+        public virtual void OnLoad(ConfigNode configGlobal, ConfigNode configVessel, ConfigNode configLocal)
         {
             try
             {
                 if (configGlobal != null) ConfigNode.LoadObjectFromConfig(this, configGlobal, (int)Pass.configGlobal);
-                if (configTechTier != null) ConfigNode.LoadObjectFromConfig(this, configTechTier, (int)Pass.configTechTier);
                 if (configVessel != null) ConfigNode.LoadObjectFromConfig(this, configVessel, (int)Pass.configVessel);
                 if (configLocal != null) ConfigNode.LoadObjectFromConfig(this, configLocal, (int)Pass.configLocal);
             }
@@ -86,12 +87,11 @@ namespace Dune
             }
         }
 
-        public virtual void OnSave(ConfigNode configGlobal, ConfigNode configTechTier, ConfigNode configVessel, ConfigNode configLocal)
+        public virtual void OnSave(ConfigNode configGlobal, ConfigNode configVessel, ConfigNode configLocal)
         {
             try
             {
                 if (configGlobal != null) ConfigNode.CreateConfigFromObject(this, (int)Pass.configGlobal, null).CopyTo(configGlobal);
-                if (configTechTier != null) ConfigNode.CreateConfigFromObject(this, (int)Pass.configTechTier, null).CopyTo(configTechTier);
                 if (configVessel != null) ConfigNode.CreateConfigFromObject(this, (int)Pass.configVessel, null).CopyTo(configVessel);
                 if (configLocal != null) ConfigNode.CreateConfigFromObject(this, (int)Pass.configLocal, null).CopyTo(configLocal);
             }

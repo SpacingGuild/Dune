@@ -5,17 +5,8 @@ namespace Dune
 {
     public class DisplayModule : ControlModule
     {
+        //TODO: For any ModuleWindow make it use this variable instead of enabled to define its visibility.
         public bool windowIsHidden = false;
-
-        public bool showInCurrentScene {
-            get 
-            {
-                return (HighLogic.LoadedScene == showInScene) ? true : false;
-            }
-        }
-        
-        [Persistent(pass = (int)Pass.configGlobal)]
-        public GameScenes showInScene = GameScenes.FLIGHT;
         
         [Persistent(pass = (int)Pass.configGlobal)]
         public Vector4 windowVector = new Vector4(10, 40, 0, 0);
@@ -79,28 +70,27 @@ namespace Dune
             {
                 enabled = false;
             }
-
             GUI.DragWindow();
         }
 
         public virtual void DrawGUI()
         {
-            if(showInCurrentScene)
+            if(runModuleInScenes.Contains(HighLogic.LoadedScene))
             {
                 windowPosition = GUILayout.Window(Id, windowPosition, WindowGUI, GetName(), WindowOptions());
             }
         }
 
-        public override void OnSave(ConfigNode configGlobal, ConfigNode configTechTier, ConfigNode configVessel, ConfigNode configLocal)
+        public override void OnSave(ConfigNode configGlobal, ConfigNode configVessel, ConfigNode configLocal)
         {
-            base.OnSave(configGlobal, configTechTier, configVessel, configLocal);
+            base.OnSave(configGlobal, configVessel, configLocal);
 
             if (configGlobal != null) configGlobal.AddValue("enabled", enabled);
         }
 
-        public override void OnLoad(ConfigNode configGlobal, ConfigNode configTechTier, ConfigNode configVessel, ConfigNode configLocal)
+        public override void OnLoad(ConfigNode configGlobal, ConfigNode configVessel, ConfigNode configLocal)
         {
-            base.OnLoad(configGlobal, configTechTier, configVessel, configLocal);
+            base.OnLoad(configGlobal, configVessel, configLocal);
 
             if(configGlobal != null && configGlobal.HasValue("enabled"))
             {
