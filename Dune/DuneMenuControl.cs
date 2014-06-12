@@ -63,7 +63,7 @@ namespace Dune
                 string name = CleanName(module.GetName());
                 if(!toolbarButtons.ContainsKey(name))
                 {
-                    Debug.Log("[Dune] MenuControl adding button for " + name);
+                    Debug.Log("[Dune] MenuControl Add btn for: " + name);
                     btn = ToolbarManager.Instance.add("Dune", name);
                     toolbarButtons[name] = btn;
                     btn.ToolTip = (module.enabled ? "Hide" : "Show")+ " Dune " + module.GetName();

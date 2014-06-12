@@ -30,7 +30,6 @@ namespace Dune
             GUILayout.Label("Remove debris:");
             if (GUILayout.Button("Execute"))
             {
-                ScreenMessages.PostScreenMessage("Removing all debris!", 5.0f, ScreenMessageStyle.UPPER_CENTER);
                 debrisControl.RemoveAll();
             }
             GUILayout.EndHorizontal();
