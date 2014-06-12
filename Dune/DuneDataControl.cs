@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Dune
 {
     public class DuneDataControl : ControlModule
     {
-        public DuneDataControl(DuneCore core) : base(core) { }
-
-        public override void OnAwake()
+        public DuneDataControl(DuneCore core) : base(core)
         {
-
+            runModuleInScenes.Add(GameScenes.FLIGHT);
         }
-
+        
         private double techTier()
         {
             List<TechLimit> _techLimits = new List<TechLimit>();
@@ -28,8 +27,7 @@ namespace Dune
             {
                 if (ResearchAndDevelopment.GetTechnologyState(limit.name) != RDTech.State.Available) continue;
 
-                //if (limit.allowCurveTweaking)
-                //    allowCurveTweaking = true;
+                
             }
             return dtechTier;
         }
