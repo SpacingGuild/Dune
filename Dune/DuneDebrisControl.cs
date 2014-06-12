@@ -4,7 +4,11 @@ namespace Dune
 {
     public class DuneDebrisControl : ControlModule
     {
-        public DuneDebrisControl(DuneCore core) : base(core) { priority = 500; }
+        public DuneDebrisControl(DuneCore core) : base(core) 
+        { 
+            priority = 500;
+            runModuleInScenes.Add(GameScenes.TRACKSTATION);
+        }
 
         [KSPField(isPersistant = true),Persistent(pass = (int)Pass.configGlobal)]
         public bool autoRemoveAll = false;

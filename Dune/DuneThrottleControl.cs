@@ -4,26 +4,27 @@ namespace Dune
 {
     public class DuneThrottleControl : ControlModule
     {
-        public DuneThrottleControl(DuneCore core) : base(core) { }
+        public DuneThrottleControl(DuneCore core) : base(core)
+        {
+            runModuleInScenes.Add(GameScenes.FLIGHT);
+        }
 
         public override void OnUpdate()
         {
-            if (HighLogic.LoadedSceneIsFlight)
-            {
-                ThrottleControl();
-            }
+            ThrottleControl();
+            //Debug.Log("[Dune] ThrottleControl OnUpdate()");
         }
 
         private void ThrottleControl()
         {
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.X))
             {
-                //Debug.LogWarning("[Dune] FlightMaxThrottle");
+                Debug.Log("[Dune] Throttle Max");
                 FlightGlobals.ActiveVessel.MaxThrottle();
             }
             if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.X))
             {
-                //Debug.LogWarning("[Dune] FlightMinThrottle");
+                Debug.Log("[Dune] Throttle Min");
                 FlightGlobals.ActiveVessel.MinThrottle();
             }
         }

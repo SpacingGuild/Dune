@@ -9,7 +9,9 @@ namespace Dune
         public DuneMenuControl(DuneCore core) : base(core)
         {
             priority = -1000;
-            enabled = true;
+            runModuleInScenes.Add(GameScenes.FLIGHT);
+            runModuleInScenes.Add(GameScenes.SPACECENTER);
+            runModuleInScenes.Add(GameScenes.TRACKSTATION);
 
             if (toolbarButtons == null)
                 toolbarButtons = new Dictionary<string, IButton>();
@@ -32,7 +34,7 @@ namespace Dune
             {
                 foreach (DisplayModule module in core.GetControlModules<DisplayModule>())
                 {
-                    if (!module.windowIsHidden && module.showInCurrentScene)
+                    if (!module.windowIsHidden && module.runModuleInScenes.Contains(HighLogic.LoadedScene))
                     {
                         module.enabled = true;
                     }
@@ -80,7 +82,7 @@ namespace Dune
                     btn = toolbarButtons[name];
                 }
 
-                btn.Visibility = new GameScenesVisibility(module.showInScene);
+                btn.Visibility = new GameScenesVisibility(module.runModuleInScenes.ToArray());
                 string TexturePath = "SpacingGuild/Dune/Icons/" + name;
                 if(GameDatabase.Instance.GetTexture(TexturePath, false) == null)
                 {

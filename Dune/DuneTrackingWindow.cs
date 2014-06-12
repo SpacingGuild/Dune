@@ -9,7 +9,7 @@ namespace Dune
         public DuneTrackingWindow(DuneCore core) : base(core) 
         {
             priority = 400;
-            showInScene = GameScenes.TRACKSTATION;
+            runModuleInScenes.Add(GameScenes.TRACKSTATION);
         }
 
         public override void OnStart()
