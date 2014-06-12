@@ -338,22 +338,17 @@ namespace Dune
                 Debug.Log(configVessel.ToString());
                 Debug.Log("configLocal:");
                 Debug.Log(configLocal.ToString());//*/
-
-                //Debug.Log("[Dune] Core OnSave() 1 Called by: " + new System.Diagnostics.StackFrame(1).GetMethod().Name);
-
-                //TODO: Fix sfsnode NRE
-                /*
+                
                 try
                 {
-                    Debug.Log("SfsNode:");
-                    Debug.Log(sfsNode.ToString());
                     if (sfsNode != null) sfsNode.nodes.Add(configLocal);
                 }
                 catch (Exception e)
                 {
                     Debug.LogError("[Dune] Core OnSave() sfsnode/configLocal: " + e);
-                }//*/
+                }
 
+                //TODO: Change vesselName to vesselID. We dont want type, we want instance.
                 if (HighLogic.LoadedSceneIsFlight)
                 {
                     string vesselName = FlightGlobals.ActiveVessel.vesselName;
