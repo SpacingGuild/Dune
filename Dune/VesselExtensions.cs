@@ -56,7 +56,7 @@ namespace Dune
         private static float lastFixedTime = 0;
         private static Dictionary<Guid, PartModule> masterObject = new Dictionary<Guid, PartModule>();
 
-        public static object GetMasterObject<T>(this Vessel thisVessel) where T : PartModule
+        public static PartModule GetMasterObject<T>(this Vessel thisVessel) where T : PartModule
         {
             if (thisVessel == null) return thisVessel.GetModules<T>().Max();
 
