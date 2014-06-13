@@ -11,8 +11,8 @@ namespace Dune
 
         public override void OnUpdate()
         {
-            ThrottleControl();
-            //Debug.Log("[Dune] ThrottleControl OnUpdate()");
+            if(!FlightGlobals.ActiveVessel.IsNull())
+                ThrottleControl();
         }
 
         private void ThrottleControl()
