@@ -10,11 +10,10 @@ namespace Dune
     public class DuneCore : ScenarioModule, IComparable<DuneCore>
     {
         //Dune Controllers
-        public DuneMenuControl _duneMenuControl;
+        public DuneDisplayControl _duneDisplayControl;
         public DuneDebrisControl _duneDebrisControl;
         public DuneThrottleControl _duneThrottleControl;
         public DuneDataControl _duneDataControl;
-        public DuneResourceControl _duneResourceControl;
 
         private List<ControlModule> controlModules = new List<ControlModule>();
         private List<ControlModule> controlModulesToLoad = new List<ControlModule>();
@@ -24,20 +23,17 @@ namespace Dune
 
         public ConfigNode partSettings;
         public static float lastSettingsSaveTime;
-        public static bool IsCareer;
+        public readonly bool IsCareer = (HighLogic.CurrentGame.Mode == Game.Modes.CAREER) ? true : false;
 
         public RenderingManager renderingManager = null;
         public bool showGui = true;
 
-        private bool run = true;
-
-
+        // Long-term Goal; Rearrange ControlModules, DisplayModules and PartModules. More control over where they exist.
 
         public void Start()
         {
             //COMMENT: Monitor Core Start()
             Debug.Log("[Dune] Core Start()");
-            IsCareer = (HighLogic.CurrentGame.Mode == Game.Modes.CAREER) ? true : false;
 
             if (controlModules.Count == 0)
             {
@@ -124,16 +120,13 @@ namespace Dune
             {
                 try
                 {
-                    if (!(module is DisplayModule))
+                    if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
                     {
-                        if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
-                        {
-                            module.enabled = true;
-                        }
-                        else
-                        {
-                            module.enabled = false;
-                        }
+                        module.enabled = true;
+                    }
+                    else
+                    {
+                        module.enabled = false;
                     }
 
                     if (module.enabled) module.OnUpdate();
@@ -182,11 +175,10 @@ namespace Dune
             }
 
             //COMMENT: Add new controlModules here.
-            _duneMenuControl = GetControlModule<DuneMenuControl>();
+            _duneDisplayControl = GetControlModule<DuneDisplayControl>();
             _duneDebrisControl = GetControlModule<DuneDebrisControl>();
             _duneThrottleControl = GetControlModule<DuneThrottleControl>();
             _duneDataControl = GetControlModule<DuneDataControl>();
-            _duneResourceControl = GetControlModule<DuneResourceControl>();
         }
 
         void LoadDelayedModules()
@@ -231,6 +223,7 @@ namespace Dune
                     }
                 }
 
+                //TODO: Change vesselName to vesselID and make it into 1 file, rather than 1 per vessel.
                 ConfigNode configVessel = new ConfigNode("DuneVesselSettings");
                 String vesselName = FlightGlobals.ActiveVessel != null ? string.Join("_", FlightGlobals.ActiveVessel.vesselName.Split(System.IO.Path.GetInvalidFileNameChars())) : ""; //Remove illegal chars from filename.
                 if ((FlightGlobals.ActiveVessel != null) && File.Exists<DuneCore>("dune_settings_type_" + vesselName + ".cfg"))
@@ -338,7 +331,7 @@ namespace Dune
                 Debug.Log(configVessel.ToString());
                 Debug.Log("configLocal:");
                 Debug.Log(configLocal.ToString());//*/
-                
+
                 try
                 {
                     if (sfsNode != null) sfsNode.nodes.Add(configLocal);
@@ -348,7 +341,6 @@ namespace Dune
                     Debug.LogError("[Dune] Core OnSave() sfsnode/configLocal: " + e);
                 }
 
-                //TODO: Change vesselName to vesselID. We dont want type, we want instance.
                 if (HighLogic.LoadedSceneIsFlight)
                 {
                     string vesselName = FlightGlobals.ActiveVessel.vesselName;
@@ -368,25 +360,6 @@ namespace Dune
 
         }
 
-        public void OnDestroy()
-        {
-            Debug.Log("[Dune] Core Destroy()");
-
-            OnSave(null);
-
-            foreach (ControlModule module in controlModules)
-            {
-                try
-                {
-                    module.OnDestroy();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError("[Dune] Core OnDestroy() module " + module.GetType().Name + " Exception: " + e);
-                }
-            }
-        }
-
         private void OnGUI()
         {
             if (!showGui) return;
@@ -404,6 +377,25 @@ namespace Dune
                     {
                         Debug.LogError("[Dune] Core OnGUI() module " + module.GetName() + " Exception: " + e);
                     }
+                }
+            }
+        }
+
+        public void OnDestroy()
+        {
+            Debug.Log("[Dune] Core Destroy()");
+
+            OnSave(null);
+
+            foreach (ControlModule module in controlModules)
+            {
+                try
+                {
+                    module.OnDestroy();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("[Dune] Core OnDestroy() module " + module.GetType().Name + " Exception: " + e);
                 }
             }
         }
