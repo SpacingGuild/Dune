@@ -8,10 +8,12 @@ namespace Dune
             : base(core)
         {
             priority = 500;
+
+            // DebrisControl needs to be enabled at all times if autoRemoveAll is true.
+            runModuleInScenes.Add(GameScenes.SPACECENTER);
+            runModuleInScenes.Add(GameScenes.FLIGHT);
             runModuleInScenes.Add(GameScenes.TRACKSTATION);
         }
-
-        //TODO: DebrisControl needs to be enabled at all times if autoRemoveAll is true.
 
         [Persistent(pass = (int)Pass.configGlobal)]
         public bool autoRemoveAll = false;
