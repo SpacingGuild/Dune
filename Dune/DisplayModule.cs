@@ -75,7 +75,7 @@ namespace Dune
 
         public virtual void DrawGUI()
         {
-            if(runModuleInScenes.Contains(HighLogic.LoadedScene) && enabled)
+            if(runModuleInScenes.Contains(HighLogic.LoadedScene) && !windowIsHidden)
             {
                 windowPosition = GUILayout.Window(Id, windowPosition, WindowGUI, GetName(), WindowOptions());
             }

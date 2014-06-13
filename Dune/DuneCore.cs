@@ -10,10 +10,11 @@ namespace Dune
     public class DuneCore : ScenarioModule, IComparable<DuneCore>
     {
         //Dune Controllers
-        public DuneDisplayControl _duneDisplayControl;
-        public DuneDebrisControl _duneDebrisControl;
-        public DuneThrottleControl _duneThrottleControl;
-        public DuneDataControl _duneDataControl;
+        public DuneDisplayControl displayControl;
+        public DuneDebrisControl debrisControl;
+        public DuneThrottleControl throttleControl;
+        public DuneDataControl dataControl;
+        public DuneSpacefolderControl spacefolderControl;
 
         private List<ControlModule> controlModules = new List<ControlModule>();
         private List<ControlModule> controlModulesToLoad = new List<ControlModule>();
@@ -23,7 +24,7 @@ namespace Dune
 
         public ConfigNode partSettings;
         public static float lastSettingsSaveTime;
-        public readonly bool IsCareer = (HighLogic.CurrentGame.Mode == Game.Modes.CAREER) ? true : false;
+        public bool IsCareer = HighLogic.CurrentGame.Mode == Game.Modes.CAREER;
 
         public RenderingManager renderingManager = null;
         public bool showGui = true;
@@ -120,13 +121,16 @@ namespace Dune
             {
                 try
                 {
-                    if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
+                    if (!(module is DisplayModule))
                     {
-                        module.enabled = true;
-                    }
-                    else
-                    {
-                        module.enabled = false;
+                        if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
+                        {
+                            module.enabled = true;
+                        }
+                        else
+                        {
+                            module.enabled = false;
+                        }
                     }
 
                     if (module.enabled) module.OnUpdate();
@@ -175,10 +179,11 @@ namespace Dune
             }
 
             //COMMENT: Add new controlModules here.
-            _duneDisplayControl = GetControlModule<DuneDisplayControl>();
-            _duneDebrisControl = GetControlModule<DuneDebrisControl>();
-            _duneThrottleControl = GetControlModule<DuneThrottleControl>();
-            _duneDataControl = GetControlModule<DuneDataControl>();
+            displayControl = GetControlModule<DuneDisplayControl>();
+            debrisControl = GetControlModule<DuneDebrisControl>();
+            throttleControl = GetControlModule<DuneThrottleControl>();
+            dataControl = GetControlModule<DuneDataControl>();
+            spacefolderControl = GetControlModule<DuneSpacefolderControl>();
         }
 
         void LoadDelayedModules()

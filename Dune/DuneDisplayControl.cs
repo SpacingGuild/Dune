@@ -25,11 +25,9 @@ namespace Dune
         private static Dictionary<string, IButton> toolbarButtons;
         private static HashSet<string> missingIcons;
 
-        //private static float lastTimeCheck = 0;
-
         public override void OnStart()
         {
-            if (!ToolbarManager.ToolbarAvailable)
+            if (ToolbarManager.ToolbarAvailable)
             {
                 SetupToolBarButtons();
             }
@@ -37,13 +35,22 @@ namespace Dune
 
         public override void OnUpdate()
         {
-            if (!ToolbarManager.ToolbarAvailable)
+            //TODO: Get rid of the buttons in the toolbar that dont belong in the scene.
+
+            if (ToolbarManager.ToolbarAvailable)
             {
-                //if (Time.time > lastTimeCheck + 5)
-                //{
-                //    lastTimeCheck = Time.time;
-                //    SetupToolBarButtons();
-                //}
+                foreach (DisplayModule module in core.GetControlModules<DisplayModule>())
+                {
+                    if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
+                    {
+                        module.enabled = true;
+
+                    }
+                    else
+                    {
+                        module.enabled = false;
+                    }
+                }
             }
         }
 
@@ -51,10 +58,7 @@ namespace Dune
         {
             foreach (DisplayModule module in core.GetControlModules<DisplayModule>())
             {
-                if (module.enabled)
-                {
-                    SetupToolbarButton(module);
-                }
+                SetupToolbarButton(module);
             }
         }
 
@@ -64,10 +68,10 @@ namespace Dune
             string name = CleanName(module.GetName());
             if (!toolbarButtons.ContainsKey(name))
             {
-                Debug.Log("[Dune] MenuControl Add btn for: " + name);
+                Debug.Log("[Dune] DisplayControl Add btn for: " + name);
                 btn = ToolbarManager.Instance.add("Dune", name);
                 toolbarButtons[name] = btn;
-                btn.ToolTip = (module.windowIsHidden ? "Show" : "Hide") + " Dune " + module.GetName();
+                btn.ToolTip = "Dune " + module.GetName();
 
                 btn.OnClick += (b) =>
                 {
@@ -84,6 +88,7 @@ namespace Dune
             }
 
             btn.Visibility = new GameScenesVisibility(module.runModuleInScenes.ToArray());
+
             string TexturePath = "SpacingGuild/Dune/Icons/" + name;
             if (GameDatabase.Instance.GetTexture(TexturePath, false) == null)
             {
