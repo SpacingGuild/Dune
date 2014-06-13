@@ -1,56 +1,88 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Dune
 {
     public class DuneDataControl : ControlModule
     {
-        public DuneDataControl(DuneCore core) : base(core)
+        public DuneDataControl(DuneCore core)
+            : base(core)
         {
             runModuleInScenes.Add(GameScenes.FLIGHT);
         }
-        
-        private double techTier()
+
+        private Vessel vessel;
+        public List<Resource> resourceList = new List<Resource>();
+
+        public override void OnUpdate()
         {
-            List<TechLimit> _techLimits = new List<TechLimit>();
-
-            double dtechTier = 0;
-
-            if (HighLogic.CurrentGame == null || HighLogic.CurrentGame.Mode != Game.Modes.CAREER) return dtechTier;
-
-            if (ResearchAndDevelopment.Instance == null)
+            if (!FlightGlobals.ActiveVessel.IsNull())
             {
-                return dtechTier;
-            }
-
-            foreach (TechLimit limit in _techLimits)
-            {
-                if (ResearchAndDevelopment.GetTechnologyState(limit.name) != RDTech.State.Available) continue;
-
-                
-            }
-            return dtechTier;
+                vessel = FlightGlobals.ActiveVessel;
+                LoadResourceList();            }
         }
 
-        private double GetCoEfficiency()
+        public double GetHoltzmanTechEfficiency()
         {
-            return techTier() + 0;
+            if (core.IsCareer)
+            {
+                if (ResearchAndDevelopment.GetTechnologyState("start") == RDTech.State.Available)
+                    return 1.00;
+
+                if (ResearchAndDevelopment.GetTechnologyState("scienceTech") == RDTech.State.Available)
+                    return 0.75;
+
+                if (ResearchAndDevelopment.GetTechnologyState("fieldScience") == RDTech.State.Available)
+                    return 0.50;
+
+                if (ResearchAndDevelopment.GetTechnologyState("advScienceTech") == RDTech.State.Available)
+                    return 0.25;
+
+                if (ResearchAndDevelopment.GetTechnologyState("experimentalScience") == RDTech.State.Available)
+                    return 0.00;
+            }
+
+            return 0.00;
         }
 
-        public double GetCostSpice(Vessel vessel, double distance)
+        private double GetSpacefolderEfficiency()
         {
-            return vessel.GetTotalMass() * System.Math.Pow(1 + GetCoEfficiency(), distance);
+            return 0;
+        }
+
+        public double GetCostSpice(double distance)
+        {
+            return vessel.GetTotalMass() * System.Math.Pow(1 + GetSpacefolderEfficiency() + GetHoltzmanTechEfficiency(), distance);
         }
 
         public double DistanceDifficulty(double distance)
         {
             return distance * (185.75 / 100.0);
         }
+
+        private void LoadResourceList()
+        {
+            foreach (var r in vessel.GetActiveResources())
+            {
+                resourceList.Add(new Resource(r.GetType().Name, r.amount, r.maxAmount));
+            }
+        }
     }
-    public sealed class TechLimit
+
+    public class Resource
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public double value { get; set; }
+        public string resourceName;
+        public double amount;
+        public double maxAmount;
+
+        public Resource() { }
+
+        public Resource(string resourceName, double amount, double maxAmount)
+        {
+            this.resourceName = resourceName;
+            this.amount = amount;
+            this.maxAmount = maxAmount;
+        }
     }
 }
