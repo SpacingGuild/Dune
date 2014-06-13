@@ -2,6 +2,7 @@
 
 namespace Dune
 {
+    //TODO: Implement either one into core system. Just as ThrottleControl.
     internal class DuneFPSControl : MonoBehaviour
     {
         public float updateInterval = 0.5F;

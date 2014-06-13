@@ -47,5 +47,15 @@ namespace Dune
                 settingsRetrieved = false;
             }
         }
+
+        public void InitiateSpacefold()
+        {
+            //TODO: Teleport vessel to X position.
+        }
+
+        public void CalculateHoltzmanEffectEngine()
+        {
+            //TODO: Calculate new ISP and Thrust depending on ship total mass.
+        }
     }
 }

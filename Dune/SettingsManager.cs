@@ -2,7 +2,7 @@
 
 namespace Dune
 {
-    //Disabled: Might be used again at some point.
+    //COMMENT: Disabled; Might be used again at some point.
     //[KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class SettingsManager : MonoBehaviour
     {

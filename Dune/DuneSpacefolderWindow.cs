@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Dune
 {
+    //COMMENT: Will this become the main [Dune] window ?
     public class DuneSpacefolderWindow : DisplayModule
     {
         public DuneSpacefolderWindow(DuneCore core)

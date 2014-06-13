@@ -368,7 +368,7 @@ namespace Dune
         private void OnGUI()
         {
             if (!showGui) return;
-            //COMMENT: Custom GUI init
+            //TODO: Implement custom GUI style
 
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION)
             {
