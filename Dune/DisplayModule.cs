@@ -5,8 +5,8 @@ namespace Dune
 {
     public class DisplayModule : ControlModule
     {
-        //TODO: For any ModuleWindow make it use this variable instead of enabled to define its visibility.
-        public bool windowIsHidden = false;
+        [Persistent(pass = (int)Pass.configGlobal)]
+        public bool windowIsHidden = true;
         
         [Persistent(pass = (int)Pass.configGlobal)]
         public Vector4 windowVector = new Vector4(10, 40, 0, 0);
@@ -68,34 +68,16 @@ namespace Dune
         {
             if(GUI.Button(new Rect(windowPosition.width - 18,2,16,16), ""))
             {
-                enabled = false;
+                windowIsHidden = true;
             }
             GUI.DragWindow();
         }
 
         public virtual void DrawGUI()
         {
-            if(runModuleInScenes.Contains(HighLogic.LoadedScene))
+            if(runModuleInScenes.Contains(HighLogic.LoadedScene) && enabled)
             {
                 windowPosition = GUILayout.Window(Id, windowPosition, WindowGUI, GetName(), WindowOptions());
-            }
-        }
-
-        public override void OnSave(ConfigNode configGlobal, ConfigNode configVessel, ConfigNode configLocal)
-        {
-            base.OnSave(configGlobal, configVessel, configLocal);
-
-            if (configGlobal != null) configGlobal.AddValue("enabled", enabled);
-        }
-
-        public override void OnLoad(ConfigNode configGlobal, ConfigNode configVessel, ConfigNode configLocal)
-        {
-            base.OnLoad(configGlobal, configVessel, configLocal);
-
-            if(configGlobal != null && configGlobal.HasValue("enabled"))
-            {
-                bool loadedEnabled;
-                if (bool.TryParse(configGlobal.GetValue("enabled"), out loadedEnabled)) enabled = loadedEnabled;
             }
         }
 

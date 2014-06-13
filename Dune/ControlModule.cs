@@ -110,9 +110,8 @@ namespace Dune
     public enum Pass
     {
         configGlobal = 1,
-        configTechTier = 2,
-        configVessel = 4,
-        configLocal = 8
+        configVessel = 2,
+        configLocal = 4
     }
 
 }
