@@ -17,15 +17,10 @@ namespace Dune
 
         private void ThrottleControl()
         {
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.X))
+            if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.Z))
             {
                 Debug.Log("[Dune] Throttle Max");
                 FlightGlobals.ActiveVessel.MaxThrottle();
-            }
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.X))
-            {
-                Debug.Log("[Dune] Throttle Min");
-                FlightGlobals.ActiveVessel.MinThrottle();
             }
         }
     }
