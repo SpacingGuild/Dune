@@ -60,6 +60,7 @@
     <Compile Include="DuneSpacefolderModule.cs" />
     <Compile Include="DuneSpacefolderWindow.cs" />
     <Compile Include="DuneTrackingWindow.cs" />
+    <Compile Include="DuneVesselWindow.cs" />
     <Compile Include="PartExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DuneThrottleControl.cs" />

@@ -9,7 +9,6 @@ namespace Dune
     [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
     public class DuneCore : ScenarioModule, IComparable<DuneCore>
     {
-        //Dune Controllers
         public DuneDisplayControl displayControl;
         public DuneDebrisControl debrisControl;
         public DuneThrottleControl throttleControl;
@@ -178,7 +177,6 @@ namespace Dune
                 Debug.LogError("[Dune] Core LoadControlModules() moduleRegistry: " + e);
             }
 
-            //COMMENT: Add new controlModules here.
             displayControl = GetControlModule<DuneDisplayControl>();
             debrisControl = GetControlModule<DuneDebrisControl>();
             throttleControl = GetControlModule<DuneThrottleControl>();
