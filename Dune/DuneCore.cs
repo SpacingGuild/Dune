@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using ExLP;
 
 namespace Dune
 {
@@ -28,6 +29,11 @@ namespace Dune
         public RenderingManager renderingManager = null;
         public bool showGui = true;
 
+        // 3rd Party plugin check;
+        public bool kethaneExists = AssemblyLoader.loadedAssemblies.Any(a => a.name == "Kethane");
+        public bool kasExists = AssemblyLoader.loadedAssemblies.Any(a => a.name == "KAS");
+        public bool exLaunchpadExists = AssemblyLoader.loadedAssemblies.Any(a => a.name == "Launchpad");
+
         // Long-term Goal; Rearrange ControlModules, DisplayModules and PartModules. More control over where they exist.
 
         public void Start()
@@ -41,7 +47,7 @@ namespace Dune
             }
 
             lastSettingsSaveTime = Time.time;
-
+            
             foreach (ControlModule module in controlModules)
             {
                 try
