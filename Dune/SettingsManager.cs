@@ -2,8 +2,8 @@
 
 namespace Dune
 {
-    //COMMENT: Disabled; Might be used again at some point.
-    //[KSPAddon(KSPAddon.Startup.Instantly, true)]
+    //TODO: Move this to persistent.cfg rather than plugin.
+    [KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class SettingsManager : MonoBehaviour
     {
         private static ConfigNode node;
@@ -27,14 +27,14 @@ namespace Dune
         public static void Save()
         {
             load();
-            Debug.LogWarning("[Dune] Saving Settings " + HighLogic.LoadedScene);
+            Debug.Log("[Dune] Saving Settings " + HighLogic.LoadedScene);
             node.Save(settingsFile);
         }
 
         private static void load()
         {
             if (node != null) { return; }
-            Debug.LogWarning("[Dune] Loading Settings " + HighLogic.LoadedScene);
+            Debug.Log("[Dune] Loading Settings " + HighLogic.LoadedScene);
             node = ConfigNode.Load(settingsFile) ?? new ConfigNode();
         }
 
@@ -50,7 +50,7 @@ namespace Dune
 
         public void OnDestroy()
         {
-            Debug.LogWarning("[Dune] SettingsManager OnDestroy saveSettings");
+            Debug.Log("[Dune] SettingsManager OnDestroy saveSettings");
             Save();
         }
     }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using ExLP;
 
 namespace Dune
 {
@@ -15,6 +14,7 @@ namespace Dune
         public DuneThrottleControl throttleControl;
         public DuneDataControl dataControl;
         public DuneSpacefolderControl spacefolderControl;
+        public DuneSettingsControl settingsControl;
 
         private List<ControlModule> controlModules = new List<ControlModule>();
         private List<ControlModule> controlModulesToLoad = new List<ControlModule>();
@@ -188,6 +188,7 @@ namespace Dune
             throttleControl = GetControlModule<DuneThrottleControl>();
             dataControl = GetControlModule<DuneDataControl>();
             spacefolderControl = GetControlModule<DuneSpacefolderControl>();
+            settingsControl = GetControlModule<DuneSettingsControl>();
         }
 
         void LoadDelayedModules()
