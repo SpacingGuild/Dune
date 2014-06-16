@@ -96,7 +96,7 @@ namespace Dune
                 if (!missingIcons.Contains(name))
                 {
                     missingIcons.Add(name);
-                    Debug.Log("[Dune] MenuControl No icon for " + name);
+                    Debug.Log("[Dune] DisplayControl No icon for " + name);
                 }
             }
             btn.TexturePath = TexturePath;
