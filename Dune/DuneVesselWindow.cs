@@ -153,7 +153,7 @@ namespace Dune
 
         public override string GetName()
         {
-            return "Vessel Data";
+            return "Vessel Window";
         }
     }
 }
