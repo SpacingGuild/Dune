@@ -13,7 +13,7 @@ namespace Dune
         public DuneDebrisControl debrisControl;
         public DuneThrottleControl throttleControl;
         public DuneDataControl dataControl;
-        public DuneSpacefolderControl spacefolderControl;
+        public DuneNavigatorControl navigatorControl;
         public DuneSettingsControl settingsControl;
 
         private List<ControlModule> controlModules = new List<ControlModule>();
@@ -30,9 +30,10 @@ namespace Dune
         public bool showGui = true;
 
         // 3rd Party plugin check;
-        public bool kethaneExists = AssemblyLoader.loadedAssemblies.Any(a => a.name == "Kethane");
-        public bool kasExists = AssemblyLoader.loadedAssemblies.Any(a => a.name == "KAS");
-        public bool exLaunchpadExists = AssemblyLoader.loadedAssemblies.Any(a => a.name == "Launchpad");
+        public bool kethaneExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "Kethane").ToString(), false);
+        public bool kasExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "KAS").ToString(), false);
+        public bool mechjeb = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "MuMechLib").ToString(), false);
+        public bool exLaunchpadExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "Launchpad").ToString(), false);
 
         // Long-term Goal; Rearrange ControlModules, DisplayModules and PartModules. More control over where they exist.
 
@@ -187,7 +188,7 @@ namespace Dune
             debrisControl = GetControlModule<DuneDebrisControl>();
             throttleControl = GetControlModule<DuneThrottleControl>();
             dataControl = GetControlModule<DuneDataControl>();
-            spacefolderControl = GetControlModule<DuneSpacefolderControl>();
+            navigatorControl = GetControlModule<DuneNavigatorControl>();
             settingsControl = GetControlModule<DuneSettingsControl>();
         }
 
