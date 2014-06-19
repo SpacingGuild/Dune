@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Dune
 {
+    // TODO: Rename all displaymodule names... edit: eh, what ?
     public class DisplayModule : ControlModule
     {
         [Persistent(pass = (int)Pass.configGlobal)]
@@ -13,6 +14,9 @@ namespace Dune
 
         [Persistent(pass = (int)Pass.configGlobal)]
         public Vector4 windowVectorTrack = new Vector4(10, 40, 0, 0);
+
+        [Persistent(pass = (int)Pass.configGlobal)]
+        public bool hideInToolbar = false;
         
         public int Id;
         public static int nextId = 6451535;
@@ -61,7 +65,7 @@ namespace Dune
 
         public virtual GUILayoutOption[] WindowOptions()
         {
-            return new GUILayoutOption[0];
+            return new GUILayoutOption[] { GUILayout.Width(250), GUILayout.Height(50) };
         }
 
         protected virtual void WindowGUI(int windowId)

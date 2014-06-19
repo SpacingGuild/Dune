@@ -9,6 +9,7 @@ namespace Dune
         public string engineName { get; private set; }
         public double engineEfficiency { get; private set; }
         public double engineFailure { get; private set; }
+        
 
         public ConfigNode configModule;
 

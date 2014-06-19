@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Dune
 {
+    //COMMENT: Wouldn't it be better for this to run on startup rather than at specific scenes ?
     public class DuneSettingsControl : ControlModule
     {
         public DuneSettingsControl(DuneCore core) : base(core)
@@ -16,19 +16,16 @@ namespace Dune
             runModuleInScenes.Add(GameScenes.EDITOR);
         }
 
-        public string difficulty = "normal";
-        public bool hardmode = false;
-
         public override void OnStart()
         {
-            difficulty = SettingsManager.GetValue("Difficulty");
-            hardmode = Utilities.TryParse(SettingsManager.GetValue("Hardmode"),false);
+            core.difficulty = SettingsManager.GetValue("Difficulty");
+            core.hardmode = Utilities.TryParse(SettingsManager.GetValue("Hardmode"),false);
         }
 
         public override void OnDestroy()
         {
-            SettingsManager.SetValue("Difficulty", difficulty);
-            SettingsManager.SetValue("hardmode", hardmode);
+            SettingsManager.SetValue("Difficulty", core.difficulty);
+            SettingsManager.SetValue("hardmode", core.hardmode);
             SettingsManager.Save();
         }
     }

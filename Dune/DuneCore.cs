@@ -7,39 +7,44 @@ using UnityEngine;
 namespace Dune
 {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
-    public class DuneCore : ScenarioModule, IComparable<DuneCore>
+    public class DuneCore : ScenarioModule
     {
-        public DuneDisplayControl displayControl;
-        public DuneDebrisControl debrisControl;
-        public DuneThrottleControl throttleControl;
-        public DuneDataControl dataControl;
-        public DuneNavigatorControl navigatorControl;
-        public DuneSettingsControl settingsControl;
+        // Reference point for all ControlModules.
+        internal DuneDisplayControl displayControl;
+        internal DuneDebrisControl debrisControl;
+        internal DuneThrottleControl throttleControl;
+        internal DuneDataControl dataControl;
+        internal DuneNavigatorControl navigatorControl;
+        internal DuneSettingsControl settingsControl;
 
+        // Internal list of ControlModules.
         private List<ControlModule> controlModules = new List<ControlModule>();
         private List<ControlModule> controlModulesToLoad = new List<ControlModule>();
         private bool controlModulesUpdated = false;
-
         private static List<Type> moduleRegistry;
 
-        public ConfigNode partSettings;
-        public static float lastSettingsSaveTime;
-        public bool IsCareer = HighLogic.CurrentGame.Mode == Game.Modes.CAREER;
+        // ConfigNode Gloabl and (hopefully) Local.
+        internal ConfigNode partSettings;
+        internal static float lastSettingsSaveTime;
 
-        public RenderingManager renderingManager = null;
-        public bool showGui = true;
+        // Global settings.
+        internal string difficulty = "normal";
+        internal bool hardmode = false;
+        internal bool IsCareer = HighLogic.CurrentGame.Mode == Game.Modes.CAREER;
+
+        internal RenderingManager renderingManager = null;
+        internal bool showGui = true;
 
         // 3rd Party plugin check;
-        public bool kethaneExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "Kethane").ToString(), false);
-        public bool kasExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "KAS").ToString(), false);
-        public bool mechjeb = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "MuMechLib").ToString(), false);
-        public bool exLaunchpadExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "Launchpad").ToString(), false);
+        internal bool kethaneExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "Kethane").ToString(), false);
+        internal bool kasExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "KAS").ToString(), false);
+        internal bool mechjeb = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "MuMechLib").ToString(), false);
+        internal bool exLaunchpadExists = Utilities.TryParse(AssemblyLoader.loadedAssemblies.Any(a => a.name == "Launchpad").ToString(), false);
 
-        // Long-term Goal; Rearrange ControlModules, DisplayModules and PartModules. More control over where they exist.
+        //TODO: Long-term Goal; Rearrange ControlModules, DisplayModules and PartModules. More control over where they exist.
 
         public void Start()
         {
-            //COMMENT: Monitor Core Start()
             Debug.Log("[Dune] Core Start()");
 
             if (controlModules.Count == 0)
@@ -48,7 +53,7 @@ namespace Dune
             }
 
             lastSettingsSaveTime = Time.time;
-            
+
             foreach (ControlModule module in controlModules)
             {
                 try
@@ -148,7 +153,7 @@ namespace Dune
             }
         }
 
-        void LoadControlModules()
+        private void LoadControlModules()
         {
             if (moduleRegistry == null)
             {
@@ -159,7 +164,6 @@ namespace Dune
                     {
                         foreach (var module in ass.GetTypes().Where(p => p.IsSubclassOf(typeof(ControlModule))).ToList())
                         {
-                            //COMMENT: Monitor Core Assemblies load.
                             Debug.LogWarning("[Dune] Core assembly loaded: " + module.FullName);
                             moduleRegistry.Add(module);
                         }
@@ -192,7 +196,7 @@ namespace Dune
             settingsControl = GetControlModule<DuneSettingsControl>();
         }
 
-        void LoadDelayedModules()
+        private void LoadDelayedModules()
         {
             if (controlModulesToLoad.Count > 0)
             {
@@ -204,12 +208,11 @@ namespace Dune
 
         public override void OnLoad(ConfigNode sfsNode)
         {
-            //COMMENT: Monitor Core OnLoad()
             Debug.Log("[Dune] Core OnLoad()");
 
-            if (false) //(GUIsomething.skin == null)
+            if (GUIDune.skin == null)
             {
-                //GameObject something = new GameObject("somethingGUILoader", typeof(SomethingGUILoader));
+                GameObject guiLoader = new GameObject("GUILoader", typeof(GUILoader));
             }
 
             try
@@ -300,9 +303,6 @@ namespace Dune
 
         public override void OnSave(ConfigNode sfsNode)
         {
-            //COMMENT: Monitor Core OnSave()
-            Debug.Log("[Dune] Core OnSave()");
-
             // Dont save if not in flight or tracking station
             if (HighLogic.LoadedScene == GameScenes.SPACECENTER) return;
             // Dont save empty settings
@@ -374,20 +374,21 @@ namespace Dune
         private void OnGUI()
         {
             if (!showGui) return;
-            //TODO: Implement custom GUI style
 
-            if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+            GUIDune.LoadSkin(GetControlModule<DuneSettingsWindow>().skinType);
+
+            GUI.skin = GUIDune.skin;
+
+
+            foreach (DisplayModule module in GetControlModules<DisplayModule>())
             {
-                foreach (DisplayModule module in GetControlModules<DisplayModule>())
+                try
                 {
-                    try
-                    {
-                        if (module.enabled) module.DrawGUI();
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("[Dune] Core OnGUI() module " + module.GetName() + " Exception: " + e);
-                    }
+                    if (module.enabled) module.DrawGUI();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("[Dune] Core OnGUI() module " + module.GetName() + " Exception: " + e);
                 }
             }
         }
@@ -453,11 +454,5 @@ namespace Dune
         }
 
         public int priority = 0;
-
-        public int CompareTo(DuneCore other)
-        {
-            if (other == null) return 1;
-            return priority.CompareTo(other.priority);
-        }
     }
 }

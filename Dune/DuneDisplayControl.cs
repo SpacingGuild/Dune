@@ -10,10 +10,10 @@ namespace Dune
             : base(core)
         {
             priority = -1000;
-            runModuleInScenes.Add(GameScenes.FLIGHT);
             runModuleInScenes.Add(GameScenes.SPACECENTER);
             runModuleInScenes.Add(GameScenes.TRACKSTATION);
             runModuleInScenes.Add(GameScenes.EDITOR);
+            runModuleInScenes.Add(GameScenes.FLIGHT);
 
             if (toolbarButtons == null)
                 toolbarButtons = new Dictionary<string, IButton>();
@@ -35,21 +35,18 @@ namespace Dune
 
         public override void OnUpdate()
         {
-            //TODO: Get rid of the buttons in the toolbar that dont belong in the scene.
-
-            if (ToolbarManager.ToolbarAvailable)
+            foreach (DisplayModule module in core.GetControlModules<DisplayModule>())
             {
-                foreach (DisplayModule module in core.GetControlModules<DisplayModule>())
+                if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
                 {
-                    if (module.runModuleInScenes.Contains(HighLogic.LoadedScene))
+                    if (!(module is SettingsDialog))
                     {
                         module.enabled = true;
-
                     }
-                    else
-                    {
-                        module.enabled = false;
-                    }
+                }
+                else
+                {
+                    module.enabled = false;
                 }
             }
         }
@@ -58,7 +55,10 @@ namespace Dune
         {
             foreach (DisplayModule module in core.GetControlModules<DisplayModule>())
             {
-                SetupToolbarButton(module);
+                if (!module.hideInToolbar)
+                {
+                    SetupToolbarButton(module);
+                }
             }
         }
 
@@ -89,10 +89,10 @@ namespace Dune
 
             btn.Visibility = new GameScenesVisibility(module.runModuleInScenes.ToArray());
 
-            string TexturePath = "SpacingGuild/Dune/Icons/" + name;
+            string TexturePath = "SpacingGuild/Dune/Textures/Icons/" + name;
             if (GameDatabase.Instance.GetTexture(TexturePath, false) == null)
             {
-                TexturePath = "SpacingGuild/Dune/Icons/QMark";
+                TexturePath = "SpacingGuild/Dune/Textures/Icons/QMark";
                 if (!missingIcons.Contains(name))
                 {
                     missingIcons.Add(name);

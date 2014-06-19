@@ -56,12 +56,15 @@
     <Compile Include="DuneDebrisControl.cs" />
     <Compile Include="DuneFPSWindow.cs" />
     <Compile Include="DuneDisplayControl.cs" />
+    <Compile Include="DuneNavigatorModule.cs" />
     <Compile Include="DuneSettingsControl.cs" />
-    <Compile Include="DuneSpacefolderControl.cs" />
+    <Compile Include="DuneNavigatorControl.cs" />
+    <Compile Include="DuneSettingsWindow.cs" />
     <Compile Include="DuneSpacefolderModule.cs" />
-    <Compile Include="DuneSpacefolderWindow.cs" />
+    <Compile Include="DuneNavigatorWindow.cs" />
     <Compile Include="DuneTrackingWindow.cs" />
     <Compile Include="DuneVesselWindow.cs" />
+    <Compile Include="GUIDune.cs" />
     <Compile Include="PartExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DuneThrottleControl.cs" />

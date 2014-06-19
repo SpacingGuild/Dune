@@ -38,10 +38,5 @@ namespace Dune
 
             base.WindowGUI(windowId);
         }
-
-        public override GUILayoutOption[] WindowOptions()
-        {
-            return new GUILayoutOption[] { GUILayout.Width(250), GUILayout.Height(50) };
-        }
     }
 }
