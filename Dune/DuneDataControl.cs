@@ -23,27 +23,27 @@ namespace Dune
                 LoadResourceList();            }
         }
 
-        public double GetHoltzmanTechEfficiency()
+        public int GetHoltzmanTechEfficiency()
         {
             if (core.IsCareer)
             {
                 if (ResearchAndDevelopment.GetTechnologyState("start") == RDTech.State.Available)
-                    return 1.00;
+                    return 5;
 
                 if (ResearchAndDevelopment.GetTechnologyState("scienceTech") == RDTech.State.Available)
-                    return 0.75;
+                    return 25;
 
                 if (ResearchAndDevelopment.GetTechnologyState("fieldScience") == RDTech.State.Available)
-                    return 0.50;
+                    return 50;
 
                 if (ResearchAndDevelopment.GetTechnologyState("advScienceTech") == RDTech.State.Available)
-                    return 0.25;
+                    return 75;
 
                 if (ResearchAndDevelopment.GetTechnologyState("experimentalScience") == RDTech.State.Available)
-                    return 0.00;
+                    return 100;
             }
 
-            return 0.00;
+            return 100;
         }
 
         private double GetSpacefolderEfficiency()

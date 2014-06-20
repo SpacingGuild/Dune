@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace Dune
@@ -19,17 +18,15 @@ namespace Dune
 
         private Vessel vessel;
 
-        public bool settingsRetrieved { get; private set; }
+        private float lastSettingsRetrieved = 0;
+        public bool SettingsRetrieved { get; private set; }
         public string engineName { get; private set; }
         public double engineEfficiency { get; private set; }
         public double engineFailure { get; private set; }
 
-        public bool initiateSpacefold = false;
-        private bool spacefoldInProgress = false;
-
-        //Variables for timing the messages, graphics and spacefold.
-        private float lastFoldMessageSent = 0;
-        private float messageCount = 0;
+        public bool spacefoldInProgress = false;
+        public bool spacefolderModuleExists = false;
+        public bool navigatorModuleExists = false;
 
         public bool stop = false;
 
@@ -47,28 +44,33 @@ namespace Dune
                 if (vessel.GetModules<DuneSpacefolderModule>().Count > 0)
                 {
                     spacefolderModules = vessel.GetModules<DuneSpacefolderModule>();
+                    spacefolderModuleExists = true;
                 }
                 else
                 {
                     spacefolderModules = null;
+                    spacefolderModuleExists = false;
                 }
 
                 // Validate the presence of a navigatorModule.
                 if (vessel.GetModules<DuneNavigatorModule>().Count > 0)
                 {
                     navigatorModule = (DuneNavigatorModule)vessel.GetMasterObject<DuneNavigatorModule>();
+                    navigatorModuleExists = true;
                 }
                 else
                 {
                     navigatorModule = null;
+                    navigatorModuleExists = false;
                 }
             }
 
-            // Collect engineData if spacefolderModule is not null.
-            if (!spacefolderModules.IsNull())
+            // Collect spacefolderModule data every 5 seconds.
+            if (Time.time > lastSettingsRetrieved + 5)
             {
                 //TODO: Figure out how to handle multiple SpacefolderModules.
-                settingsRetrieved = true;
+                lastSettingsRetrieved = Time.time;
+                SettingsRetrieved = true;
                 foreach (var r in spacefolderModules.OrderBy(p => p.engineEfficiency).Take(1))
                 {
                     engineName = r.engineName;
@@ -78,53 +80,39 @@ namespace Dune
             }
             else
             {
-                settingsRetrieved = false;
-            }
-
-            // Run checks against the navigatorModule for changes. Stop when initiatingSpacefold == true.
-            if (!navigatorModule.IsNull() && !initiateSpacefold)
-            {
-                initiateSpacefold = navigatorModule.initiateSpacefold;
-            }
-
-            // Stop checking for updates and start the spacefold procedure.
-            if (initiateSpacefold && !spacefoldInProgress)
-            {
-                navigatorModule.initiateSpacefold = initiateSpacefold;
-
-                //if (Time.time > lastFoldMessageSent + 1)
-                //{
-                //    lastFoldMessageSent = Time.time;
-                //    ScreenMessages.PostScreenMessage("Initiating Spacefold in T MINUS: " + (messageCount - 5) * -1, 5.0f, ScreenMessageStyle.UPPER_CENTER);
-                //    messageCount = messageCount + 1;
-                //    if (messageCount == 5)
-                //    {
-                        spacefoldInProgress = true;
-
-                        // Start the preliminary spacefold procedure.
-                        PreliminarySpacefoldProcedure();
-                //    }
-                //}
+                SettingsRetrieved = false;
             }
         }
 
-        public void PreliminarySpacefoldProcedure()
+        public SpacefoldState PreliminarySpacefoldProcedure(bool activate, int targetBodyId)
         {
-            Debug.Log("[Dune] NavigatorControl PreliminarySpacefoldProcedure() Started!");
+            Debug.Log("[Dune] NavigatorControl PreliminarySpacefoldProcedure() Started!" + activate + " " + targetBodyId);
+            GUIContent[] tempList = planetEntries();
 
-            // TODO: Setup dynamic orbit.
+            if(!spacefolderModuleExists)
+            {
+                return SpacefoldState.NO_SPACEFOLDER;
+            }
+            if(!navigatorModuleExists)
+            {
+                return SpacefoldState.NO_NAVIGATOR;
+            }
+
+            return setOrbit(FlightGlobals.Bodies.FirstOrDefault(p => p.name == tempList[targetBodyId].text));
         }
+
+        public enum SpacefoldState { SUCCESS, NO_FUEL, ABOVE_SOI, FAILURE, NOT_IN_ORBIT, NO_SPACEFOLDER, NO_NAVIGATOR };
 
         public GUIContent[] planetEntries()
         {
             List<CelestialBody> planets = FlightGlobals.Bodies;
             CelestialBody theSun = planets.FirstOrDefault(p => p.name == "Sun");
-            GUIContent[] planetEntries = new GUIContent[planets.Count(p => p.referenceBody == theSun)];
+            GUIContent[] planetEntries = new GUIContent[planets.Count(p => p.referenceBody == theSun && p != theSun)];
 
             int count = 0;
-            foreach(var r in planets)
+            foreach (var r in planets)
             {
-                if (r.referenceBody == theSun)
+                if (r.referenceBody == theSun && r != theSun)
                 {
                     planetEntries[count] = new GUIContent(r.name, new Texture());
                     count++;
@@ -134,26 +122,35 @@ namespace Dune
             return planetEntries;
         }
 
-        public void setOrbit(CelestialBody targetBody)
+        public SpacefoldState setOrbit(CelestialBody targetBody)
         {
-            CelestialBody body = targetBody;
+            // Current orbit
+            Orbit currentOrbit = vessel.orbit;
 
-            // New values
+            // Tech Efficiency
+            int techEfficiency = core.dataControl.GetHoltzmanTechEfficiency();
+
+            System.Random rand = new System.Random();
             Orbit newOrbit = new Orbit();
-            newOrbit.inclination = 0;
-            newOrbit.eccentricity = 0;
-            newOrbit.semiMajorAxis = (body.Radius + body.sphereOfInfluence)/2;
+            // New values
+            newOrbit.inclination = Convert.ToDouble(rand.Next((int)currentOrbit.inclination, (int)20));
+            newOrbit.eccentricity = Convert.ToDouble(rand.Next((int)currentOrbit.eccentricity, (int)10));
+            newOrbit.semiMajorAxis = targetBody.Radius + (targetBody.sphereOfInfluence / techEfficiency);
             newOrbit.LAN = 90;
             newOrbit.argumentOfPeriapsis = 90;
             newOrbit.meanAnomalyAtEpoch = 0;
             newOrbit.epoch = 0;
-            newOrbit.referenceBody = body;
+            newOrbit.referenceBody = targetBody;
+
+            Debug.Log("inclination: " + newOrbit.inclination);
+            Debug.Log("eccentricity: " + newOrbit.eccentricity);
+            Debug.Log("semiMajorAxis: " + newOrbit.semiMajorAxis);
 
 
             if (newOrbit.getRelativePositionAtUT(Planetarium.GetUniversalTime()).magnitude > newOrbit.referenceBody.sphereOfInfluence)
             {
                 Debug.LogError("Destination position was above the sphere of influence");
-                return;
+                return SpacefoldState.ABOVE_SOI;
             }
 
             vessel.Landed = false;
@@ -164,8 +161,9 @@ namespace Dune
             {
                 OrbitPhysicsManager.HoldVesselUnpack(60);
             }
-            catch (NullReferenceException)
+            catch (Exception e)
             {
+                Debug.LogError("[Dune] NavigatorControl setOrbit() exception on physicsManager: " + e);
             }
 
             foreach (var v in (FlightGlobals.fetch == null ? (IEnumerable<Vessel>)new[] { vessel } : FlightGlobals.Vessels).Where(v => v.packed == false))
@@ -185,6 +183,9 @@ namespace Dune
 
             vessel.orbitDriver.pos = vessel.orbit.pos.xzy;
             vessel.orbitDriver.vel = vessel.orbit.vel;
+
+            spacefoldInProgress = false;
+            return SpacefoldState.SUCCESS;
         }
 
         //public void CalculateHoltzmanEffectEngine()

@@ -15,6 +15,7 @@ namespace Dune
         public override void OnUpdate()
         {
             deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
+            base.OnUpdate();
         }
 
         protected override void WindowGUI(int windowId)

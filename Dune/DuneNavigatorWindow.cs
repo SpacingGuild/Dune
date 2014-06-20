@@ -17,10 +17,13 @@ namespace Dune
             runModuleInScenes.Add(GameScenes.FLIGHT);
         }
 
+        new public bool windowIsHidden = true;
+
         private GUIContent[] menuContent;
         private GUIStyle listStyle = new GUIStyle();
-        private int selectedItemIndex;
+        private int selectedPlanetIndex;
         private int selectedMenuIndex = 0;
+        private Vector2 scrollPosition = Vector2.zero;
 
         public override void OnStart()
         {
@@ -35,7 +38,6 @@ namespace Dune
 
         protected override void WindowGUI(int windowId)
         {
-            // TODO: Create main window.
             GUILayout.BeginVertical();
 
             GUIDune.Image(GUIDune.DuneLogo);
@@ -52,7 +54,7 @@ namespace Dune
             {
                 GUIDune.Title("Overview");
                 GUIDune.Label("", "Higher is better");
-                GUIDune.Label("Holtzman Efficiency: ", (1 - core.dataControl.GetHoltzmanTechEfficiency()) * 100 + "%");
+                GUIDune.Label("Holtzman Efficiency: ", (core.dataControl.GetHoltzmanTechEfficiency()) + "%");
             }
             if (selectedMenuIndex == 1)
             {
@@ -60,17 +62,47 @@ namespace Dune
 
                 // Show Navigator Controls if not activated.
 
-                if (core.navigatorControl.initiateSpacefold)
+                if (core.navigatorControl.spacefoldInProgress)
                 {
                     GUIDune.Title("Spacefold in progress!");
                 }
                 else
                 {
-                    selectedItemIndex = GUILayout.SelectionGrid(selectedItemIndex, core.navigatorControl.planetEntries(), 5);
+                    scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+                    GUILayout.BeginHorizontal();
+                    selectedPlanetIndex = GUILayout.SelectionGrid(selectedPlanetIndex, core.navigatorControl.planetEntries(), 1);
 
-                    if (GUILayout.Button("Activate Spacefold"))
+                    GUILayout.BeginVertical();
+                    GUIDune.Label("some text", "some value");
+                    GUIDune.Label("some text", "some value");
+                    GUIDune.Label("some text", "some value");
+                    GUIDune.Label("some text", "some value");
+                    GUILayout.EndVertical();
+
+                    GUILayout.EndHorizontal();
+                    GUILayout.EndScrollView();
+                    if (!HighLogic.LoadedSceneIsFlight)
                     {
-                        core.navigatorControl.initiateSpacefold = true;
+                        GUIDune.Warning("Warning: You can't initiate a spacefold, when you are not in a vessel!");
+                    }
+                    else if (!core.navigatorControl.spacefolderModuleExists)
+                    {
+                        GUIDune.Warning("Warning: You can't initiate a spacefold, when your vessel does not contain a Spacefolder!");
+                    }
+                    else if (!core.navigatorControl.navigatorModuleExists)
+                    {
+                        GUIDune.Warning("Warning: You can't initiate a spacefold, when your vessel does not contain a Navigator Core!");
+                    }
+                    else if (core.navigatorControl.planetEntries()[selectedPlanetIndex].text == FlightGlobals.currentMainBody.name)
+                    {
+                        GUIDune.Warning("Warning: You can't initiate a spacefold to the same planet that you are at!");
+                    }
+                    else
+                    {
+                        if (GUILayout.Button("Activate Spacefold", new GUIStyle(GUI.skin.button) { margin = new RectOffset(10, 10, 5, 20) }))
+                        {
+                           var state = core.navigatorControl.PreliminarySpacefoldProcedure(true, selectedPlanetIndex);
+                        }
                     }
                 }
             }
@@ -80,11 +112,11 @@ namespace Dune
 
                 // Show engine layout.
                 GUIDune.Title("Engine Data");
-                if (core.navigatorControl.settingsRetrieved)
+                if (core.navigatorControl.SettingsRetrieved)
                 {
                     GUIDune.Label("Engine Name: ", core.navigatorControl.engineName);
-                    GUIDune.Label("Engine Efficency: ", (1 - core.navigatorControl.engineEfficiency) * 100 + "%");
-                    GUIDune.Label("Engine Failure: ", (1 - core.navigatorControl.engineFailure) * 100 + "%");
+                    GUIDune.Label("Engine Efficency: ", core.navigatorControl.engineEfficiency + "%");
+                    GUIDune.Label("Engine Failure: ", core.navigatorControl.engineFailure + "%");
                 }
             }
             if (selectedMenuIndex == 3)
@@ -106,10 +138,6 @@ namespace Dune
 
             GUILayout.EndVertical();
 
-            // TODO: Fix the window clickthrough.
-            // http://answers.unity3d.com/questions/16774/preventing-mouse-clicks-from-passing-through-gui-c.html
-            // http://forum.unity3d.com/threads/gui-window-resolving-flicker-preventing-click-thru-understanding-events.170647/
-            //GUIUtility.hotControl = 0;
             base.WindowGUI(windowId);
         }
 
@@ -120,7 +148,7 @@ namespace Dune
 
         public override string GetName()
         {
-            return "Navigator Window";
+            return String.Empty;
         }
     }
 }

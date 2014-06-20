@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Dune
@@ -8,7 +9,7 @@ namespace Dune
     {
         [Persistent(pass = (int)Pass.configGlobal)]
         public bool windowIsHidden = true;
-        
+
         [Persistent(pass = (int)Pass.configGlobal)]
         public Vector4 windowVector = new Vector4(10, 40, 0, 0);
 
@@ -17,7 +18,7 @@ namespace Dune
 
         [Persistent(pass = (int)Pass.configGlobal)]
         public bool hideInToolbar = false;
-        
+
         public int Id;
         public static int nextId = 6451535;
 
@@ -32,11 +33,11 @@ namespace Dune
             }
             set
             {
-                if(HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+                if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 {
                     windowVectorTrack = new Vector4
                     (
-                        Math.Min(Math.Max(value.x, 0),Screen.width - value.width),
+                        Math.Min(Math.Max(value.x, 0), Screen.width - value.width),
                         Math.Min(Math.Max(value.y, 0), Screen.height - value.height),
                         value.width, value.height
                     );
@@ -57,10 +58,13 @@ namespace Dune
             }
         }
 
-        public DisplayModule(DuneCore core) : base(core)
+        public DisplayModule(DuneCore core)
+            : base(core)
         {
             Id = nextId;
             nextId++;
+
+            InputLockManager.RemoveControlLock("DuneLockPart" + Id);
         }
 
         public virtual GUILayoutOption[] WindowOptions()
@@ -70,18 +74,51 @@ namespace Dune
 
         protected virtual void WindowGUI(int windowId)
         {
-            if(GUI.Button(new Rect(windowPosition.width - 18,2,16,16), ""))
+            if (GUI.Button(new Rect(windowPosition.width - 18, 2, 16, 16), ""))
             {
                 windowIsHidden = true;
+                InputLockManager.RemoveControlLock("DuneLockPart" + Id);
             }
             GUI.DragWindow();
         }
-
+        //private readonly int id = new System.Random().Next(int.MaxValue);
+        private bool isEditorLocked = false;
         public virtual void DrawGUI()
         {
-            if(runModuleInScenes.Contains(HighLogic.LoadedScene) && !windowIsHidden)
+            if (runModuleInScenes.Contains(HighLogic.LoadedScene) && !windowIsHidden)
             {
                 windowPosition = GUILayout.Window(Id, windowPosition, WindowGUI, GetName(), WindowOptions());
+
+                if (HighLogic.LoadedSceneIsEditor)
+                {
+                    // Lock parts while mouse is over the window.
+                    if (windowPosition.Contains(Input.mousePosition) && !isEditorLocked)
+                    {
+                        EditorTooltip.Instance.HideToolTip();
+                        EditorLogic.fetch.Lock(true, true, true, "DuneLockPart" + Id);
+                        isEditorLocked = true;
+                    }
+                    else if (!windowPosition.Contains(Input.mousePosition) && isEditorLocked)
+                    {
+                        EditorLogic.fetch.Unlock("DuneLockPart" + Id);
+                        isEditorLocked = false;
+                    }
+                }
+                else
+                {
+                    // Hide part rightclick menu.
+                    if (!GUIUtility.hotControl.IsNull())
+                    {
+                        if (windowPosition.Contains(Input.mousePosition) && GUIUtility.hotControl == 0) // use && Input.GetMouseButton(0)) to not hide the window, but prevent button click.
+                        {
+                            foreach (var window in GameObject.FindObjectsOfType(typeof(UIPartActionWindow)).OfType<UIPartActionWindow>().Where(p => p.Display == UIPartActionWindow.DisplayType.Selected))
+                            {
+                                window.enabled = false;
+                                window.displayDirty = true;
+                            }
+                        }
+                    }
+                }
             }
         }
 

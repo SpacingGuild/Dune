@@ -7,26 +7,6 @@ namespace Dune
     public class DuneNavigatorModule : PartModule
     {
         public ConfigNode configModule;
-        public bool initiateSpacefold = false;
-
-        //[KSPField(isPersistant = false, guiActive = true, guiName = "Spacefold Cooldown: ")]
-        //public string spacefoldCooldown = "Standby";
-
-        //[KSPEvent(guiActive = true, guiName = "Activate", active = true, guiActiveUnfocused = true)]
-        //public void ActivateSpacefold()
-        //{
-        //    initiateSpacefold = true;
-        //    Events["ActivateSpacefold"].active = false;
-        //    Events["DeactivateSpacefold"].active = true;
-        //}
-
-        //[KSPEvent(guiActive = true, guiName = "Deactivate", active = false, guiActiveUnfocused = true)]
-        //public void DeactivateSpacefold()
-        //{
-        //    initiateSpacefold = false;
-        //    Events["DeactivateSpacefold"].active = false;
-        //    Events["ActivateSpacefold"].active = true;
-        //}
 
         public override void OnStart(PartModule.StartState state)
         {

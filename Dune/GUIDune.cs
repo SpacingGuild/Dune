@@ -103,9 +103,14 @@ namespace Dune
             return new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
         }
 
+        public static GUIStyle SetWarningStyle()
+        {
+            return new GUIStyle(GUI.skin.box) { fontStyle = FontStyle.BoldAndItalic, alignment = TextAnchor.MiddleCenter, fontSize = 18, margin = new RectOffset(10, 10, 5, 20) };
+        }
+
         public static GUIStyle SetFooterAlignCenter()
         {
-            return new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Italic, alignment = TextAnchor.MiddleCenter, fontSize = 10 };
+            return new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Italic, alignment = TextAnchor.MiddleCenter, fontSize = 10};
         }
 
         public static GUIStyle SetAlignCenter()
@@ -142,11 +147,24 @@ namespace Dune
         #endregion
 
         #region Label Controls
+        public static void Warning(string label)
+        {
+            GUILayout.BeginHorizontal();
+
+            Color prevColor = GUI.color;
+            GUI.color = Color.red;
+            //GUILayout.Label(label, SetWarningStyle(), GUILayout.ExpandWidth(true));
+            GUILayout.Box(label, SetWarningStyle());
+            GUI.color = prevColor;
+
+            GUILayout.EndHorizontal();
+        }
+
         public static void Title(string label)
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label(label, SetTitleAlignCenter(), GUILayout.ExpandWidth(true));
+            GUILayout.Label(label, SetTitleAlignCenter());
 
             GUILayout.EndHorizontal();
         }
@@ -155,7 +173,7 @@ namespace Dune
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label(label, SetFooterAlignCenter(), GUILayout.ExpandWidth(true));
+            GUILayout.Label(label, SetFooterAlignCenter());
 
             GUILayout.EndHorizontal();
         }

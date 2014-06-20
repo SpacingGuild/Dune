@@ -25,6 +25,7 @@ namespace Dune
 
         public override void OnStart()
         {
+            // COMMENT: Possible fix for CoM, CoT and CoL EditorMarker_CoL.Instantiate()
             objCoM = new GameObject("objectCenterMass");
             objCoT = new GameObject("objectCenterThrust");
             objCoL = new GameObject("objectCenterLift");
